@@ -87,10 +87,17 @@ public class ParkingService {
 
     // Hours are rounded up, with a minimum of 1 hour
     double calculateFee(Ticket t) {
-        long minutes = Duration.between(t.getInTime(), t.getOutTime()).toMinutes();
+        return feeFor(t.getVehicle().getType(), Duration.between(t.getInTime(), t.getOutTime()).toMinutes());
+    }
+
+    // Fee so far for a vehicle that is still parked (used by the UI)
+    public double currentFee(Ticket t) {
+        return feeFor(t.getVehicle().getType(), Duration.between(t.getInTime(), clock.get()).toMinutes());
+    }
+
+    private double feeFor(String type, long minutes) {
         long hours = Math.max(1, (long) Math.ceil(minutes / 60.0));
-        double rate = ParkingService.CAR.equals(t.getVehicle().getType())
-                ? CAR_RATE_PER_HOUR : BIKE_RATE_PER_HOUR;
+        double rate = ParkingService.CAR.equals(type) ? CAR_RATE_PER_HOUR : BIKE_RATE_PER_HOUR;
         return hours * rate;
     }
 
